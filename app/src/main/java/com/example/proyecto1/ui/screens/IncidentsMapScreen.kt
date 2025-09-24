@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.example.proyecto1.ui.screens
 
 import androidx.compose.foundation.layout.*
@@ -7,6 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Pantalla "Inicio": mapa + acciones.
+ * Expone los callbacks que estás usando desde MainActivity/NavHost.
+ */
 @Composable
 fun IncidentsMapScreen(
     onOpenChat: () -> Unit,
@@ -16,11 +22,18 @@ fun IncidentsMapScreen(
     onOpenRoleVerification: () -> Unit,
     onSilentAlertConfirmed: () -> Unit
 ) {
-    var showConfirm by remember { mutableStateOf(false) }
+    var showSilentAlertDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Zonapp") })
+            TopAppBar(
+                title = { Text("Zonapp") },
+                actions = {
+                    // Acciones rápidas en la app bar (opcional)
+                    TextButton(onClick = onOpenProfile) { Text("Perfil") }
+                    TextButton(onClick = onOpenAdmin) { Text("Admin") }
+                }
+            )
         }
     ) { padding ->
         Column(
@@ -28,52 +41,54 @@ fun IncidentsMapScreen(
                 .padding(padding)
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // ----- Mapa (placeholder) -----
-            Surface(
+            // Placeholder del "mapa"
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                tonalElevation = 2.dp,
-                shape = MaterialTheme.shapes.medium
+                    .height(220.dp)
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Mapa (placeholder)")
+                    Text("Aquí iría el mapa/viewport")
                 }
             }
 
-            // ----- Acciones principales -----
+            Spacer(Modifier.height(16.dp))
+
+            // Botón principal: Chat vecinal
             Button(
                 onClick = onOpenChat,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Chat vecinal") }
+            ) {
+                Text("Chat vecinal")
+            }
 
+            Spacer(Modifier.height(12.dp))
+
+            // Botón de alerta silenciosa (abre diálogo de confirmación)
             Button(
-                onClick = { showConfirm = true },
+                onClick = { showSilentAlertDialog = true },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) { Text("Alerta silenciosa") }
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text("Alerta silenciosa")
+            }
 
-            // ----- Accesos auxiliares (según tus mockups) -----
+            Spacer(Modifier.height(24.dp))
+
+            // Acciones extra sugeridas por tu flujo
             OutlinedButton(
                 onClick = onOpenReports,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Reportes de incidentes") }
+            ) { Text("Reportes") }
 
-            OutlinedButton(
-                onClick = onOpenProfile,
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Perfil / Ajustes") }
-
-            OutlinedButton(
-                onClick = onOpenAdmin,
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Panel Admin") }
+            Spacer(Modifier.height(12.dp))
 
             OutlinedButton(
                 onClick = onOpenRoleVerification,
@@ -82,18 +97,18 @@ fun IncidentsMapScreen(
         }
     }
 
-    if (showConfirm) {
+    if (showSilentAlertDialog) {
         AlertDialog(
-            onDismissRequest = { showConfirm = false },
-            title = { Text("¿Enviar alerta silenciosa a las autoridades?") },
+            onDismissRequest = { showSilentAlertDialog = false },
+            title = { Text("¿Desea enviar una alerta silenciosa a las autoridades?") },
             confirmButton = {
                 TextButton(onClick = {
-                    showConfirm = false
+                    showSilentAlertDialog = false
                     onSilentAlertConfirmed()
                 }) { Text("Confirmar") }
             },
             dismissButton = {
-                TextButton(onClick = { showConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showSilentAlertDialog = false }) { Text("Cancelar") }
             }
         )
     }

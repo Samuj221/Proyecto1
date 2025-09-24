@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.example.proyecto1.ui.screens
 
 import androidx.compose.foundation.layout.*
@@ -11,16 +13,20 @@ fun ProfileScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ajustes de usuario") },
-                navigationIcon = { TextButton(onClick = onBack) { Text("Atrás") } }
+                title = { Text("Perfil") },
+                navigationIcon = {
+                    TextButton(onClick = onBack) { Text("Atrás") }
+                }
             )
         }
     ) { padding ->
         Box(
-            modifier = Modifier.padding(padding).fillMaxSize(),
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("Formulario de perfil / cerrar sesión")
+            Text("Ajustes de usuario (UI)")
         }
     }
 }

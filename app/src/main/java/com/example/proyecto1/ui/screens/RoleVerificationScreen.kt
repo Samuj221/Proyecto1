@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.example.proyecto1.ui.screens
 
 import androidx.compose.foundation.layout.*
@@ -12,15 +14,19 @@ fun RoleVerificationScreen(onBack: () -> Unit) {
         topBar = {
             TopAppBar(
                 title = { Text("Verificación de rol") },
-                navigationIcon = { TextButton(onClick = onBack) { Text("Atrás") } }
+                navigationIcon = {
+                    TextButton(onClick = onBack) { Text("Atrás") }
+                }
             )
         }
     ) { padding ->
         Box(
-            modifier = Modifier.padding(padding).fillMaxSize(),
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("Flujo para moderador/vecino/policía (UI)")
+            Text("Flujo de validación (UI)")
         }
     }
 }
