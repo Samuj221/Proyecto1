@@ -10,7 +10,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-// Colores – si ya tienes Color.kt y Typography (Type.kt), puedes dejarlos igual
 private val DarkColors = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
