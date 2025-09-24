@@ -6,5 +6,5 @@ sealed class Route(val route: String) {
     object Reports : Route("reports")
     object Profile : Route("profile")
     object Admin : Route("admin")
-    object RoleVerification : Route("role_verification")
+    object RoleVerification : Route("roleVerification")
 }
