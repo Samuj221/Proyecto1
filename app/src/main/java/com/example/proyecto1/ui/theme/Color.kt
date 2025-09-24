@@ -2,10 +2,15 @@ package com.example.proyecto1.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Colores base de las maquetas
+val ZonappBlue      = Color(0xFF59A3D8)   // barra/títulos
+val ZonappBlueDark  = Color(0xFF256EA6)
+val ZonappOrange    = Color(0xFFF4A259)   // tarjetas de lista
+val ZonappRed       = Color(0xFFE25549)   // alerta silenciosa / CTA
+val ZonappGray      = Color(0xFFF1F3F5)
+val ZonappText      = Color(0xFF222222)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Modo oscuro
+val ZonappBlue80    = Color(0xFF8CC4EA)
+val ZonappOrange80  = Color(0xFFF7C08F)
+val ZonappRed80     = Color(0xFFF09A94)
