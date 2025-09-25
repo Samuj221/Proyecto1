@@ -8,13 +8,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AdminPanelScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
         Text("Panel de administración", style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
-        Text("Validación/Verificación de reportes pendiente de implementar.")
+        Text("Validación/Verificación de reportes (pendiente de implementar).")
     }
 }

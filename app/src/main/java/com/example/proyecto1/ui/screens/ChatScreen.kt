@@ -1,4 +1,3 @@
-
 package com.example.proyecto1.ui.screens
 
 import androidx.compose.foundation.layout.*
@@ -10,7 +9,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ChatScreen() {
     Column(Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Chat vecinal (mock)", style = MaterialTheme.typography.titleLarge)
+        Text("Chat vecinal", style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
         Text("Aquí iría la lista de mensajes y la caja de texto.")
     }
