@@ -23,45 +23,35 @@ sealed interface DrawerItem {
 
 @Composable
 fun AppDrawer(
-    currentRoute: String?,
     onItemClick: (DrawerItem) -> Unit
 ) {
     ModalDrawerSheet {
-        // Cabecera con tu logo
-        Box(
+        // Cabecera con logo
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp, bottom = 16.dp),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.zonapp_logo // pon tu drawable aquí
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(128.dp)
-                        .clip(CircleShape)
-                )
-                Text(
-                    "Zonapp",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier.padding(top = 12.dp)
-                )
-            }
+            Image(
+                painter = painterResource(id = R.drawable.zonapp_logo),
+                contentDescription = "Logo",
+                modifier = Modifier.size(120.dp).clip(CircleShape)
+            )
+            Text(
+                "Zonapp",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.padding(top = 12.dp)
+            )
         }
-
-        Spacer(Modifier.height(8.dp))
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Person, null) },
-            label = { Text("Nombre / Perfil") },
+            label = { Text("Perfil") },
             selected = false,
             onClick = { onItemClick(DrawerItem.Profile) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
-
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Settings, null) },
             label = { Text("Ajustes") },

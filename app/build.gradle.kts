@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") // Compose + Kotlin 2.x
+    id("org.jetbrains.kotlin.plugin.compose") // requerido en Kotlin 2.x
 }
 
 android {
@@ -19,22 +19,22 @@ android {
 
     buildFeatures { compose = true }
 
-    // ❌ si tienes composeOptions { kotlinCompilerExtensionVersion = "..." } elimínalo en Kotlin 2.x
+    // NO usar composeOptions con Kotlin 2.x (se maneja por el plugin):
+    // composeOptions { kotlinCompilerExtensionVersion = "..." }
 
-    // Alinea Java/Javac a 17
+    // Alinear Java/Javac a 17
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        // Si usas APIs Java 8+ en minSdk bajos, puedes activar desugaring:
-        // isCoreLibraryDesugaringEnabled = true
+        // isCoreLibraryDesugaringEnabled = true // (opcional)
     }
 
-    // Opcional, pero claro: di a Kotlin que apunte a 17
+    // Alinear Kotlin a 17
     kotlinOptions {
         jvmTarget = "17"
     }
 
-    // (Opcional) flags del compilador de Compose
+    // Opcional: flags del compilador de Compose
     composeCompiler {
         enableStrongSkippingMode.set(true)
     }
@@ -44,18 +44,17 @@ android {
     }
 }
 
-// Usa el JDK 17 para Kotlin (evita que tome 21 si lo tienes instalado)
+// Fuerza toolchain de Kotlin a JDK 17
 kotlin {
     jvmToolchain(17)
 }
 
 dependencies {
-    // BOM de Compose
     val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
-    // UI Compose
+    // Compose UI
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -66,20 +65,20 @@ dependencies {
     // Navegación
     implementation("androidx.navigation:navigation-compose:2.8.0")
 
-    // Activity + lifecycle compose
+    // Activity + Lifecycle
     implementation("androidx.activity:activity-compose:1.9.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
-    // Icons extendidas
+    // Icons (hamburguesa, etc.)
     implementation("androidx.compose.material:material-icons-extended:1.7.2")
 
-    // Coil
+    // Coil (si usas imágenes remotas en otras pantallas)
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     // Google Maps Compose
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
-    // Si activaste desugaring arriba, añade:
+    // Desugaring si activaste arriba:
     // coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

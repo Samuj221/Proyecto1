@@ -3,6 +3,7 @@ package com.example.proyecto1.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -22,7 +23,7 @@ fun RoleVerificationScreen(onBack: () -> Unit) {
         Column(
             modifier = Modifier.padding(padding).fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Flujo de validación (UI)")
             Spacer(Modifier.height(16.dp))
@@ -35,12 +36,8 @@ fun RoleVerificationScreen(onBack: () -> Unit) {
             onDismissRequest = { showDialog = false },
             title = { Text("Validación del suceso") },
             text = { Text("Elige una opción") },
-            confirmButton = {
-                TextButton(onClick = { showDialog = false /* subir foto */ }) { Text("Subir una foto") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false /* tomar foto */ }) { Text("Tomar una foto") }
-            }
+            confirmButton = { TextButton(onClick = { showDialog = false }) { Text("Subir una foto") } },
+            dismissButton = { TextButton(onClick = { showDialog = false }) { Text("Tomar una foto") } }
         )
     }
 }
