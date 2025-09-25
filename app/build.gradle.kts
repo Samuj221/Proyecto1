@@ -1,7 +1,11 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") // requerido con Kotlin 2.x
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+
+kotlin {
+    jvmToolchain(21)
 }
 
 android {
@@ -15,52 +19,49 @@ android {
         versionCode = 1
         versionName = "1.0"
         vectorDrawables { useSupportLibrary = true }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
 
     buildFeatures { compose = true }
 
-    // ❌ No uses composeOptions con Kotlin 2.x (lo maneja el plugin)
-
-    // Alinear Java a 17
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
-    // Alinear Kotlin a 17
-    kotlinOptions {
-        jvmTarget = "17"
+    packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+    dependencies {
+        val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
+        implementation(composeBom)
+        androidTestImplementation(composeBom)
+
+        implementation("androidx.compose.material:material-icons-extended")
+
+        implementation("androidx.core:core-ktx:1.13.1")
+        implementation("androidx.activity:activity:1.9.2")
+        implementation("androidx.activity:activity-ktx:1.9.2")
+        implementation("androidx.activity:activity-compose:1.9.2")
+
+        implementation("androidx.compose.ui:ui")
+        implementation("androidx.compose.ui:ui-tooling-preview")
+        debugImplementation("androidx.compose.ui:ui-tooling")
+        implementation("androidx.compose.material3:material3")
+        implementation("androidx.navigation:navigation-compose:2.8.1")
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+        implementation("com.google.maps.android:maps-compose:4.3.3")
+        implementation("com.google.android.gms:play-services-maps:19.0.0")
+        implementation("com.google.android.gms:play-services-location:21.3.0")
     }
 
-    // (Opcional) flags del compilador de Compose
-    composeCompiler {
-        enableStrongSkippingMode.set(true)
-    }
 
-    packaging {
-        resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
-    }
-}
-
-// Fuerza toolchain de Kotlin a JDK 17 (Foojay la descarga si no existe)
-kotlin {
-    jvmToolchain(17)
-}
-
-dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
-    implementation("androidx.compose.material:material-icons-extended:1.7.2")
-    implementation("io.coil-kt:coil-compose:2.7.0")
-    implementation("com.google.maps.android:maps-compose:4.4.1")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }

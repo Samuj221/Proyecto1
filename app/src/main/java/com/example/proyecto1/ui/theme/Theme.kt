@@ -1,24 +1,25 @@
+// Theme.kt
 package com.example.proyecto1.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+
+private val ZonappColors: ColorScheme = lightColorScheme(
+    primary = ZonBlue,
+    onPrimary = ZonOnBlue,
+    primaryContainer = ZonBlueContainer,
+    onPrimaryContainer = ZonBlue,
+    secondary = ZonOrange,
+    surface = ZonSurface
+)
 
 @Composable
-fun Proyecto1Theme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val scheme =
-        if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val ctx = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(ctx) else dynamicLightColorScheme(ctx)
-        } else {
-            if (darkTheme) darkColorScheme() else lightColorScheme()
-        }
-
-    MaterialTheme(colorScheme = scheme, content = content)
+fun ZonappTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = ZonappColors,
+        typography = androidx.compose.material3.Typography(),
+        content = content
+    )
 }

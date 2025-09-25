@@ -22,7 +22,6 @@ dependencyResolutionManagement {
 rootProject.name = "Proyecto1"
 include(":app")
 
-// ⬇️ Habilita auto-descarga de JDK (si falta) vía Foojay
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }

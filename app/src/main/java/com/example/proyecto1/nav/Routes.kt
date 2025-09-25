@@ -1,10 +1,9 @@
-package com.example.proyecto1.nav
+package com.example.proyecto1.ui.navigation
 
-sealed class Route(val route: String) {
-    object Home : Route("home")
-    object Chat : Route("chat")
-    object Reports : Route("reports")
-    object Profile : Route("profile")
-    object Admin : Route("admin")
-    object RoleVerification : Route("roleVerification")
+sealed class Routes(val route: String) {
+    data object Home : Routes("home")
+    data object Incidents : Routes("incidents_map")
+    data object Chat : Routes("chat")
+    data object Profile : Routes("profile")
+    data object Admin : Routes("admin_panel")
 }
