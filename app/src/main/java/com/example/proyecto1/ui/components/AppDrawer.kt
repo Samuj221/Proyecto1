@@ -16,7 +16,7 @@ fun AppDrawer(onItemClick: (DrawerItem) -> Unit) {
             modifier = Modifier.padding(16.dp)
         )
 
-        // Itera sobre los DrawerItem que quieras mostrar
+        // Lista de opciones del menú
         listOf(
             DrawerItem.Profile,
             DrawerItem.Settings,

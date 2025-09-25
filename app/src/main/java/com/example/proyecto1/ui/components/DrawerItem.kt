@@ -1,6 +1,6 @@
 package com.example.proyecto1.ui.components
 
-// Representa los elementos del Drawer de la app
+// Representa los ítems del Drawer (menú lateral)
 sealed class DrawerItem(val title: String, val route: String) {
     object Profile : DrawerItem("Perfil", "profile")
     object Settings : DrawerItem("Configuración", "settings")
