@@ -12,12 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1.ui.components.AppDrawer
 import com.example.proyecto1.ui.components.DrawerItem
-import com.example.proyecto1.ui.screens.AdminPanelScreen
-import com.example.proyecto1.ui.screens.ChatScreen
-import com.example.proyecto1.ui.screens.IncidentsMapScreen
-import com.example.proyecto1.ui.screens.ProfileScreen
-import com.example.proyecto1.ui.screens.ReportsScreen
-import com.example.proyecto1.ui.screens.RoleVerificationScreen
+import com.example.proyecto1.ui.screens.*
 import com.example.proyecto1.ui.theme.Proyecto1Theme
 import kotlinx.coroutines.launch
 
@@ -51,20 +46,15 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        NavHost(
-                            navController = nav,
-                            startDestination = "profile"
-                        ) {
-                            composable("profile") { ProfileScreen   () }
+                        NavHost(navController = nav, startDestination = "profile") {
+                            composable("profile") { ProfileScreen(onBack = { nav.popBackStack() }) }
                             composable("settings") { Text("Pantalla de Configuración") }
-                            composable("admin") { AdminPanelScreen() }
-                            composable("reports") { ReportsScreen() }
-                            composable("incidents") { IncidentsMapScreen() }
-                            composable("chat") { ChatScreen() }
-                            composable("roleVerification") { RoleVerificationScreen() }
-
+                            composable("admin") { AdminPanelScreen(onBack = { nav.popBackStack() }) }
+                            composable("reports") { ReportsScreen(onBack = { nav.popBackStack() }) }
+                            composable("incidents") { IncidentsMapScreen( onBack = { nav.popBackStack() }) }
+                            composable("chat") { ChatScreen(onBack = { nav.popBackStack() }) }
+                            composable("roleVerification") { RoleVerificationScreen(onBack = { nav.popBackStack() }) }
                         }
-
                     }
                 }
             }

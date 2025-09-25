@@ -15,6 +15,7 @@ data class ChatMessage(val id: Long, val author: String, val text: String, val i
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun ChatScreen(onBack: () -> Unit) {
     var input by remember { mutableStateOf("") }
     val messages = remember {
