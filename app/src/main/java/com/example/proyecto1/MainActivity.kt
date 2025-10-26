@@ -14,8 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1.ui.components.AppDrawer
-import com.example.proyecto1.ui.components.DrawerItem
-import com.example.proyecto1.ui.navigation.Routes
 import com.example.proyecto1.ui.screens.*
 import com.example.proyecto1.ui.theme.ZonappTheme
 import kotlinx.coroutines.launch
