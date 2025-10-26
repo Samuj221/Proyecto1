@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,55 +31,64 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ZonappApp() {
     ZonappTheme {
-        val navController = rememberNavController()
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val nav = rememberNavController()
+        val drawer = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
         val items = listOf(
-            DrawerItem("Inicio", Icons.Default.Home, Routes.Home.route),
-            DrawerItem("Reportes", Icons.Default.List, Routes.Reports.route),
-            DrawerItem("Chat vecinal", Icons.Default.Chat, Routes.Chat.route),
-            DrawerItem("Ajustes", Icons.Default.Settings, Routes.Profile.route),
-            DrawerItem("Admin", Icons.Default.VerifiedUser, Routes.Admin.route),
+            DrawerItem("Inicio", Icons.Rounded.Home, Routes.Home.route),
+            DrawerItem("Reportes", Icons.Rounded.ListAlt, Routes.Reports.route),
+            DrawerItem("Chat vecinal", Icons.Rounded.Chat, Routes.Chat.route),
+            DrawerItem("Ajustes", Icons.Rounded.Settings, Routes.Profile.route),
+            DrawerItem("Admin", Icons.Rounded.Verified, Routes.Admin.route),
         )
 
         ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = { AppDrawer(items) { route ->
-                scope.launch {
-                    drawerState.close()
-                    navController.navigate(route) {
-                        popUpTo(Routes.Home.route) { inclusive = false }
-                        launchSingleTop = true
+            drawerState = drawer,
+            drawerContent = {
+                AppDrawer(items) { route ->
+                    scope.launch {
+                        drawer.close()
+                        nav.navigate(route) {
+                            popUpTo(Routes.Home.route) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     }
                 }
-            } }
+            }
         ) {
             Scaffold(
                 topBar = {
-                    TopAppBar(
+                    CenterAlignedTopAppBar(
                         title = { Text("Zonapp") },
                         navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menú")
+                            IconButton({ scope.launch { drawer.open() } }) {
+                                Icon(Icons.Rounded.Menu, contentDescription = "Menú")
                             }
-                        }
+                        },
+                        actions = {
+                            IconButton(onClick = { /* TODO: notificaciones */ }) {
+                                Icon(Icons.Rounded.Notifications, contentDescription = "Notificaciones")
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     )
                 }
             ) { inner ->
-                NavHost(
-                    navController = navController,
-                    startDestination = Routes.Home.route,
-                    modifier = Modifier.padding(inner)
-                ) {
+                NavHost(navController = nav, startDestination = Routes.Home.route, modifier = Modifier.padding(inner)) {
                     composable(Routes.Home.route) {
-                        HomeScreen(onGoToChat = { navController.navigate(Routes.Chat.route) })
+                        HomeScreen(onGoToChat = { nav.navigate(Routes.Chat.route) })
                     }
                     composable(Routes.Reports.route) {
-                        ReportsListScreen(onCreate = { navController.navigate(Routes.ReportCreate.route) })
+                        ReportsListScreen(onCreate = { nav.navigate(Routes.ReportCreate.route) })
                     }
                     composable(Routes.ReportCreate.route) {
-                        ReportCreateScreen(onDone = { navController.popBackStack() })
+                        ReportCreateScreen(onDone = { nav.popBackStack() })
                     }
                     composable(Routes.Chat.route) { ChatScreen() }
                     composable(Routes.Profile.route) { ProfileScreen() }

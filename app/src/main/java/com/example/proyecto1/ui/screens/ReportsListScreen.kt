@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,47 +19,65 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+
+
 
 @Composable
 fun ReportsListScreen(onCreate: () -> Unit) {
-    val context = LocalContext.current
+    val ctx = LocalContext.current
     val (myLoc, _) = rememberMyLocation()
     val center = myLoc ?: LatLng(4.6539, -74.0580)
 
-    val reports = remember(myLoc) {
-        mutableStateOf(
-            if (myLoc != null) ReportsRepository.near(context, myLoc, 3000f)
-            else ReportsRepository.all(context)
-        )
+    var filter by remember { mutableStateOf<Severity?>(null) }
+
+    val reports = remember(myLoc, filter) {
+        val base = if (myLoc != null) ReportsRepository.near(ctx, myLoc, 3000f) else ReportsRepository.all(ctx)
+        mutableStateOf(if (filter == null) base else base.filter { it.severity == filter })
     }
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(center, 13.5f)
-    }
+    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(center, 13.5f) }
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
 
-            GoogleMap(
-                modifier = Modifier.fillMaxWidth().height(240.dp),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(isMyLocationEnabled = myLoc != null),
-                uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                shape = MaterialTheme.shapes.large,
+                elevation = CardDefaults.elevatedCardElevation(4.dp)
             ) {
-                reports.value.forEach { r ->
-                    Marker(
-                        state = MarkerState(position = r.latLng),
-                        title = r.title,
-                        snippet = r.description,
-                        icon = BitmapDescriptorFactory.defaultMarker(
-                            when (r.severity) {
-                                Severity.HIGH -> BitmapDescriptorFactory.HUE_RED
-                                Severity.MEDIUM -> BitmapDescriptorFactory.HUE_YELLOW
-                                Severity.LOW -> BitmapDescriptorFactory.HUE_GREEN
-                            }
+                GoogleMap(
+                    modifier = Modifier.fillMaxWidth().height(220.dp),
+                    cameraPositionState = camera,
+                    properties = MapProperties(isMyLocationEnabled = myLoc != null),
+                    uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
+                ) {
+                    reports.value.forEach { r ->
+                        Marker(
+                            state = MarkerState(position = r.latLng),
+                            title = r.title, snippet = r.description,
+                            icon = BitmapDescriptorFactory.defaultMarker(
+                                when (r.severity) {
+                                    Severity.HIGH -> BitmapDescriptorFactory.HUE_RED
+                                    Severity.MEDIUM -> BitmapDescriptorFactory.HUE_YELLOW
+                                    Severity.LOW -> BitmapDescriptorFactory.HUE_GREEN
+                                }
+                            )
                         )
-                    )
+                    }
                 }
+            }
+
+            // Filtros por severidad
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(selected = filter == null, onClick = { filter = null }, label = { Text("Todos") })
+                FilterChip(selected = filter == Severity.LOW, onClick = { filter = Severity.LOW }, label = { Text("Bajo") })
+                FilterChip(selected = filter == Severity.MEDIUM, onClick = { filter = Severity.MEDIUM }, label = { Text("Medio") })
+                FilterChip(selected = filter == Severity.HIGH, onClick = { filter = Severity.HIGH }, label = { Text("Alto") })
             }
 
             Spacer(Modifier.height(8.dp))
@@ -76,10 +92,7 @@ fun ReportsListScreen(onCreate: () -> Unit) {
             }
         }
 
-        FloatingActionButton(
-            onClick = onCreate,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
-        ) { Icon(Icons.Default.Add, contentDescription = "Crear reporte") }
+
     }
 }
 
@@ -95,10 +108,10 @@ private fun ReportRow(r: Report) {
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(14.dp).background(color, shape = MaterialTheme.shapes.small))
+            Box(Modifier.size(12.dp).background(color, shape = MaterialTheme.shapes.small))
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(r.title, fontWeight = FontWeight.SemiBold)
+                Text(r.title, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(2.dp))
                 Text(r.description, color = Color.Gray, fontSize = 12.sp, maxLines = 2)
             }

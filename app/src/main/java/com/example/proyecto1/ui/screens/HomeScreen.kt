@@ -1,6 +1,5 @@
 package com.example.proyecto1.ui.screens
 
-import android.Manifest
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -8,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NotificationsOff
+import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,68 +27,64 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(onGoToChat: () -> Unit = {}) {
     val context = LocalContext.current
-    val (myLoc, requestLoc) = rememberMyLocation()
-    val scope = rememberCoroutineScope()
+    val (myLoc, _) = rememberMyLocation()
 
     val center = myLoc ?: LatLng(4.6539, -74.0580)
-    val cameraPositionState = rememberCameraPositionState {
+    val camera = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(center, 14.5f)
     }
-
-    LaunchedEffect(myLoc) {
-        myLoc?.let {
-            scope.launch {
-                cameraPositionState.animate(
-                    update = CameraUpdateFactory.newLatLngZoom(it, 15f),
-                    durationMs = 800
-                )
-            }
-        }
-    }
+    LaunchedEffect(myLoc) { myLoc?.let { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 15f), 800) } }
 
     var showConfirm by remember { mutableStateOf(false) }
 
-    Column(
-        Modifier.fillMaxSize().padding(top = 12.dp, bottom = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Alertas en\nTu zona",
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-            textAlign = TextAlign.Center
-        )
+    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(Modifier.height(8.dp))
+        Text("Alertas en\nTu zona", style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp), textAlign = TextAlign.Center)
         Spacer(Modifier.height(12.dp))
 
-        // Mapa circular
-        Box(Modifier.size(280.dp).clip(CircleShape)) {
-            GoogleMap(
-                modifier = Modifier.matchParentSize(),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(isMyLocationEnabled = myLoc != null),
-                uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
-            )
+        // MAPA EN CÍRCULO dentro de Card
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.elevatedCardElevation(6.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(Modifier.size(280.dp).clip(CircleShape)) {
+                    GoogleMap(
+                        modifier = Modifier.matchParentSize(),
+                        cameraPositionState = camera,
+                        properties = MapProperties(isMyLocationEnabled = myLoc != null),
+                        uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
+                    )
+                }
+            }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(20.dp))
 
-        // Botón Chat
+        // Chat vecinal
         OutlinedButton(
             onClick = onGoToChat,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(52.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             shape = MaterialTheme.shapes.medium
         ) { Text("Chat vecinal") }
 
         Spacer(Modifier.height(16.dp))
 
-        // CTA Alerta silenciosa (gradiente + sombra)
+        // CTA: Alerta silenciosa (gradiente + sombra + icono)
         Button(
             onClick = { showConfirm = true },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(64.dp)
@@ -106,7 +101,7 @@ fun HomeScreen(onGoToChat: () -> Unit = {}) {
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.NotificationsOff, contentDescription = null, tint = Color.White)
+                    Icon(Icons.Rounded.NotificationsOff, contentDescription = null, tint = Color.White)
                     Spacer(Modifier.width(8.dp))
                     Text("Alerta silenciosa", color = Color.White)
                 }
@@ -122,9 +117,10 @@ fun HomeScreen(onGoToChat: () -> Unit = {}) {
                 FilledTonalButton(onClick = {
                     showConfirm = false
                     Toast.makeText(context, "Alerta silenciosa enviada", Toast.LENGTH_SHORT).show()
+                    // TODO: lógica real del envío
                 }) { Text("Confirmar") }
             },
-            dismissButton = { OutlinedButton(onClick = { showConfirm = false }) { Text("Cancelar") } }
+            dismissButton = { OutlinedButton({ showConfirm = false }) { Text("Cancelar") } }
         )
     }
 }

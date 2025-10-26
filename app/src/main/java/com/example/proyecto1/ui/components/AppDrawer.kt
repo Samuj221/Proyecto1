@@ -21,14 +21,11 @@ import com.example.proyecto1.ui.theme.ZonBlueContainer
 @Composable
 fun AppDrawer(items: List<DrawerItem>, onItemClick: (String) -> Unit) {
     Column(Modifier.fillMaxWidth()) {
-        // Header moderno con gradiente y logo
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(180.dp)
-                .background(
-                    Brush.verticalGradient(listOf(ZonBlue, ZonBlueContainer))
-                ),
+                .background(Brush.verticalGradient(listOf(ZonBlue, ZonBlueContainer))),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -41,14 +38,13 @@ fun AppDrawer(items: List<DrawerItem>, onItemClick: (String) -> Unit) {
                 Text("Zonapp", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
             }
         }
-
         LazyColumn {
-            items(items) { item ->
+            items(items) { i ->
                 NavigationDrawerItem(
-                    label = { Text(item.title) },
-                    icon = { Icon(item.icon, null) },
+                    label = { Text(i.title) },
+                    icon = { Icon(i.icon, null) },
                     selected = false,
-                    onClick = { onItemClick(item.route) },
+                    onClick = { onItemClick(i.route) },
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
