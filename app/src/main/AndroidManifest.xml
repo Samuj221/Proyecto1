@@ -8,6 +8,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Splash">
 
+        <!-- API key de Google Maps (pon tu clave real en res/values/google_maps_api.xml) -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

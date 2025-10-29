@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyecto1.ui.theme.ZonRed
 import com.example.proyecto1.ui.theme.ZonRedDark
+import com.example.proyecto1.util.isPlayServicesOk
 import com.example.proyecto1.util.rememberMockLocation
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -31,10 +32,10 @@ import com.google.maps.android.compose.*
 @Composable
 fun HomeScreen(onGoToChat: () -> Unit = {}) {
     val context = LocalContext.current
-    // ✅ Usamos una función SIN ambigüedad
-    val myLoc: LatLng? = rememberMockLocation()
+    val myLoc: LatLng? = rememberMockLocation()        // stub sin permisos (no crashea)
+    val hasGms = remember { isPlayServicesOk(context) } // ¿hay Google Play Services?
 
-    val center = myLoc ?: LatLng(4.6539, -74.0580)
+    val center = myLoc ?: LatLng(4.6539, -74.0580) // Bogotá por defecto
     val camera = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(center, 14.5f)
     }
@@ -53,7 +54,7 @@ fun HomeScreen(onGoToChat: () -> Unit = {}) {
         )
         Spacer(Modifier.height(12.dp))
 
-        // MAPA dentro de Card
+        // ======= MAPA / FALLBACK =======
         Card(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -67,19 +68,28 @@ fun HomeScreen(onGoToChat: () -> Unit = {}) {
                     .height(300.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Box(Modifier.size(280.dp).clip(CircleShape)) {
-                    GoogleMap(
-                        modifier = Modifier.matchParentSize(),
-                        cameraPositionState = camera,
-                        properties = MapProperties(isMyLocationEnabled = false),
-                        uiSettings = MapUiSettings(
-                            zoomControlsEnabled = false,
-                            myLocationButtonEnabled = false
+                if (hasGms) {
+                    Box(Modifier.size(280.dp).clip(CircleShape)) {
+                        GoogleMap(
+                            modifier = Modifier.matchParentSize(),
+                            cameraPositionState = camera,
+                            properties = MapProperties(isMyLocationEnabled = false),
+                            uiSettings = MapUiSettings(
+                                zoomControlsEnabled = false,
+                                myLocationButtonEnabled = false
+                            )
                         )
+                    }
+                } else {
+                    Text(
+                        "Mapa no disponible en este dispositivo.\n(Usa un emulador/telefono con Google Play Services).",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp)
                     )
                 }
             }
         }
+        // ======= FIN MAPA =======
 
         Spacer(Modifier.height(20.dp))
 

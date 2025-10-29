@@ -15,18 +15,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.proyecto1.data.ReportsRepository
 import com.example.proyecto1.data.Severity
+import com.example.proyecto1.util.isPlayServicesOk
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 
 @Composable
 fun ReportCreateScreen(onDone: () -> Unit) {
     val context = LocalContext.current
+    val hasGms = remember { isPlayServicesOk(context) }
 
     var title by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
@@ -39,15 +36,34 @@ fun ReportCreateScreen(onDone: () -> Unit) {
     }
 
     Column(Modifier.fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.fillMaxWidth().height(240.dp),
-            cameraPositionState = cameraPositionState,
-            onMapClick = { picked = it },
-            properties = MapProperties(),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false)
-        ) {
-            picked?.let { Marker(state = MarkerState(it)) }
+
+        // ======= MAPA / FALLBACK =======
+        if (hasGms) {
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp),
+                cameraPositionState = cameraPositionState,
+                onMapClick = { picked = it },
+                properties = MapProperties(),
+                uiSettings = MapUiSettings(zoomControlsEnabled = false)
+            ) {
+                picked?.let { Marker(state = MarkerState(it)) }
+            }
+        } else {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp)
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text("Mapa no disponible (sin Google Play Services)")
+                }
+            }
         }
+        // ======= FIN MAPA =======
 
         Spacer(Modifier.height(8.dp))
 
@@ -55,19 +71,25 @@ fun ReportCreateScreen(onDone: () -> Unit) {
             value = title,
             onValueChange = { title = it },
             label = { Text("Título") },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
             label = { Text("Descripción") },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         )
 
         Spacer(Modifier.height(8.dp))
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             SeverityChip("Bajo", Color(0xFF43A047), severity == Severity.LOW) { severity = Severity.LOW }
@@ -83,7 +105,13 @@ fun ReportCreateScreen(onDone: () -> Unit) {
                 if (title.text.isBlank() || p == null) {
                     Toast.makeText(context, "Completa título y toca el mapa para ubicar", Toast.LENGTH_SHORT).show()
                 } else {
-                    ReportsRepository.add(context, title.text.trim(), description.text.trim(), severity, p)
+                    ReportsRepository.add(
+                        context,
+                        title.text.trim(),
+                        description.text.trim(),
+                        severity,
+                        p
+                    )
                     Toast.makeText(context, "Reporte enviado", Toast.LENGTH_SHORT).show()
                     onDone()
                 }
@@ -112,13 +140,22 @@ fun ReportCreateScreen(onDone: () -> Unit) {
 }
 
 @Composable
-private fun SeverityChip(text: String, color: Color, selected: Boolean, onClick: () -> Unit) {
+private fun SeverityChip(
+    text: String,
+    color: Color,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         label = { Text(text) },
         leadingIcon = {
-            Box(Modifier.size(12.dp).background(color, shape = MaterialTheme.shapes.small))
+            Box(
+                Modifier
+                    .size(12.dp)
+                    .background(color, shape = MaterialTheme.shapes.small)
+            )
         }
     )
 }
