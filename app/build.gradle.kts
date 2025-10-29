@@ -1,15 +1,15 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") // <- requerido con Kotlin 2.x
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
-    namespace = "com.example.proyecto1"      // <-- usa tu paquete
+    namespace = "com.example.proyecto1"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.proyecto1"  // <-- idem arriba
+        applicationId = "com.example.proyecto1"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -27,16 +27,22 @@ android {
         }
     }
 
-    buildFeatures { compose = true }
+    // Alinear Java (Javac) a 17
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
+    }
 
-    // ⚠️ Importante: elimina cualquier bloque composeOptions { kotlinCompilerExtensionVersion = "..." }
-    // Con Kotlin 2.x el plugin maneja la compatibilidad del compilador de Compose.
+    // Compose
+    buildFeatures { compose = true }
 
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 
+kotlin { jvmToolchain(17) }
+
 dependencies {
-    // BOM de Compose: alinea versiones entre los artefactos de Compose
     val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -45,18 +51,26 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
 
-    // UI Compose
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
 
-    // (Opcional, si usas navegación/animaciones de Compose)
     implementation("androidx.navigation:navigation-compose:2.8.3")
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
 
-    // Debug tooling
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+
+
+    // Material Components (para estilos Theme.Material3.* en recursos)
+    implementation("com.google.android.material:material:1.12.0")
+
+    // SplashScreen (attrs windowSplashScreen*)
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

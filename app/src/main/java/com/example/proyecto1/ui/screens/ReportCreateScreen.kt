@@ -13,10 +13,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.proyecto1.data.*
+import com.example.proyecto1.data.ReportsRepository
+import com.example.proyecto1.data.Severity
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun ReportCreateScreen(onDone: () -> Unit) {
@@ -36,25 +42,34 @@ fun ReportCreateScreen(onDone: () -> Unit) {
         GoogleMap(
             modifier = Modifier.fillMaxWidth().height(240.dp),
             cameraPositionState = cameraPositionState,
-            onMapClick = { picked = it }
-        ) { picked?.let { Marker(state = MarkerState(it)) } }
+            onMapClick = { picked = it },
+            properties = MapProperties(),
+            uiSettings = MapUiSettings(zoomControlsEnabled = false)
+        ) {
+            picked?.let { Marker(state = MarkerState(it)) }
+        }
 
         Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = title, onValueChange = { title = it },
+            value = title,
+            onValueChange = { title = it },
             label = { Text("Título") },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
-            value = description, onValueChange = { description = it },
+            value = description,
+            onValueChange = { description = it },
             label = { Text("Descripción") },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
 
         Spacer(Modifier.height(8.dp))
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             SeverityChip("Bajo", Color(0xFF43A047), severity == Severity.LOW) { severity = Severity.LOW }
             SeverityChip("Medio", Color(0xFFFFB300), severity == Severity.MEDIUM) { severity = Severity.MEDIUM }
             SeverityChip("Alto", Color(0xFFE53935), severity == Severity.HIGH) { severity = Severity.HIGH }
@@ -73,16 +88,21 @@ fun ReportCreateScreen(onDone: () -> Unit) {
                     onDone()
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             contentPadding = PaddingValues(),
             shape = RoundedCornerShape(12.dp)
         ) {
             Box(
-                Modifier.fillMaxSize().background(
-                    Brush.horizontalGradient(listOf(Color(0xFF42A5F5), Color(0xFF1976D2))),
-                    RoundedCornerShape(12.dp)
-                ),
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(listOf(Color(0xFF42A5F5), Color(0xFF1976D2))),
+                        RoundedCornerShape(12.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) { Text("Enviar reporte", color = Color.White) }
         }

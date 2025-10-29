@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1.navigation.Routes
 import com.example.proyecto1.ui.components.AppDrawer
+import com.example.proyecto1.ui.components.DrawerItem
 import com.example.proyecto1.ui.screens.*
 import com.example.proyecto1.ui.theme.ZonappTheme
 import kotlinx.coroutines.launch
@@ -78,7 +80,11 @@ fun ZonappApp() {
                     )
                 }
             ) { inner ->
-                NavHost(navController = nav, startDestination = Routes.Home.route, modifier = Modifier.padding(inner)) {
+                NavHost(
+                    navController = nav,
+                    startDestination = Routes.Home.route,
+                    modifier = Modifier.padding(inner)
+                ) {
                     composable(Routes.Home.route) {
                         HomeScreen(onGoToChat = { nav.navigate(Routes.Chat.route) })
                     }
