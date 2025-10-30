@@ -24,10 +24,9 @@ import com.google.maps.android.compose.*
 fun HomeScreen(onGoToChat: () -> Unit = {}, onGoToReports: () -> Unit, onGoToMap: () -> Unit) {
     val ctx = LocalContext.current
 
-    // Play Services ok?
+
     val hasGms = remember(ctx) { isPlayServicesOk(ctx) }
 
-    // Ubicación observada como State<LatLng?>
     val myLoc by rememberMyLocation()
 
     val center = myLoc ?: LatLng(4.6539, -74.0580) // Bogotá
@@ -35,7 +34,7 @@ fun HomeScreen(onGoToChat: () -> Unit = {}, onGoToReports: () -> Unit, onGoToMap
         position = CameraPosition.fromLatLngZoom(center, 14.5f)
     }
 
-    // Animar cuando llega la ubicación
+
     LaunchedEffect(myLoc) {
         myLoc?.let { camera.animate(GmsCameraUpdateFactory.newLatLngZoom(it, 15f), 800) }
     }

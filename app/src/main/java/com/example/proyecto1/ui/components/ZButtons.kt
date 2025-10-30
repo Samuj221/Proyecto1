@@ -17,8 +17,7 @@ fun PrimaryGradientButton(
     shape: Shape = MaterialTheme.shapes.medium,
     enabled: Boolean = true
 ) {
-    // Nota: M3 Button no soporta gradiente “de fábrica”.
-    // Para mantener compilando y respetar el tema, usamos el color primario.
+
     Button(
         onClick = onClick,
         modifier = modifier,

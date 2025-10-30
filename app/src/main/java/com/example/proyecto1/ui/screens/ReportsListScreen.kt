@@ -15,10 +15,10 @@ import com.example.proyecto1.data.ReportsRepository
 fun ReportsListScreen(onCreate: () -> Unit) {
     val ctx = LocalContext.current
 
-    // Carga inicial desde preferencias
+
     LaunchedEffect(Unit) { ReportsRepository.load(ctx) }
 
-    // Evito collectAsState para no depender de imports: recojo a mano el flujo
+
     val reportsState = remember { mutableStateOf<List<Report>>(emptyList()) }
     LaunchedEffect(Unit) {
         ReportsRepository.items.collect { reportsState.value = it }

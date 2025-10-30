@@ -41,7 +41,7 @@ fun AppNavHost(
         composable(Routes.Profile.route) { ProfileScreen() }
         composable(Routes.Admin.route)   { AdminPanelScreen() }
 
-        // Si NO tienes IncidentsMapScreen todavía, comenta esta route.
+
         composable(Routes.IncidentsMap.route) { IncidentsMapScreen() }
     }
 }

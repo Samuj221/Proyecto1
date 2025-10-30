@@ -83,16 +83,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1") // Task.await()
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
 
-    // Media (micrófono / reproducción)
+
     implementation("androidx.media3:media3-exoplayer:1.4.1")
     implementation("androidx.compose.runtime:runtime-saveable")
 
 
-    // Desugaring
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
-// ✅ Aplica Google Services SOLO si existe app/google-services.json
 if (project.file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
     println("✅ google-services.json encontrado: se aplica com.google.gms.google-services")

@@ -33,7 +33,6 @@ fun ChatScreen(
     val listState = rememberLazyListState()
     var input by rememberSaveable { mutableStateOf("") }
 
-    // Auto-scroll al último mensaje
     LaunchedEffect(vm.messages.size) {
         if (vm.messages.isNotEmpty()) {
             listState.animateScrollToItem(vm.messages.lastIndex)

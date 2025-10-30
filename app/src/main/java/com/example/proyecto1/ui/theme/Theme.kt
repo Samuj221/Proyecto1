@@ -42,7 +42,7 @@ private val DarkColors: ColorScheme = darkColorScheme(
 @Composable
 fun ZonappTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // mantenlo false si quieres colores de marca
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val ctx = LocalContext.current

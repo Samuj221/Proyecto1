@@ -21,10 +21,10 @@ data class ChatMessage(
 )
 
 object ChatRepository {
-    // ===== Fallback in-memory cuando no hay Firebase =====
+
     private val localBus = MutableStateFlow<List<ChatMessage>>(emptyList())
 
-    // ===== Firebase =====
+
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { Firebase.firestore }
 
