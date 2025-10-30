@@ -1,4 +1,3 @@
 <resources>
-    <!-- Reemplaza por tu clave real; con un placeholder no crashea (sólo verás el mapa en gris) -->
     <string name="google_maps_key" translatable="false">YOUR_API_KEY_HERE</string>
 </resources>

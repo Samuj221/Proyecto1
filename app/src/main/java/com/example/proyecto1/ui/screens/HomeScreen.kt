@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.sp
 import com.example.proyecto1.ui.theme.ZonRed
 import com.example.proyecto1.ui.theme.ZonRedDark
 import com.example.proyecto1.util.isPlayServicesOk
-import com.example.proyecto1.util.rememberMockLocation
+import com.example.proyecto1.util.rememberAccelerometerMagnitude
+import com.example.proyecto1.util.rememberLightLux
+import com.example.proyecto1.util.rememberLocationState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -32,100 +34,77 @@ import com.google.maps.android.compose.*
 @Composable
 fun HomeScreen(onGoToChat: () -> Unit = {}) {
     val context = LocalContext.current
-    val myLoc: LatLng? = rememberMockLocation()        // stub sin permisos (no crashea)
-    val hasGms = remember { isPlayServicesOk(context) } // ¿hay Google Play Services?
+    val hasGms = remember { isPlayServicesOk(context) }
+    val loc = rememberLocationState()
 
-    val center = myLoc ?: LatLng(4.6539, -74.0580) // Bogotá por defecto
+    val center = loc.lastKnown ?: LatLng(4.6539, -74.0580)
     val camera = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(center, 14.5f)
     }
-    LaunchedEffect(myLoc) {
-        myLoc?.let { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 15f), 800) }
+    LaunchedEffect(loc.lastKnown) {
+        loc.lastKnown?.let { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 15f), 800) }
     }
 
-    var showConfirm by remember { mutableStateOf(false) }
+    // Sensores
+    val accel = rememberAccelerometerMagnitude()
+    val light = rememberLightLux()
+
+    // “Shake to SOS”
+    LaunchedEffect(accel) {
+        if (accel > 25f) { // sacudida fuerte
+            Toast.makeText(context, "Sacudida detectada (SOS)", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(8.dp))
-        Text(
-            "Alertas en\nTu zona",
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-            textAlign = TextAlign.Center
-        )
+        Text("Alertas en\nTu zona", style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp), textAlign = TextAlign.Center)
         Spacer(Modifier.height(12.dp))
 
-        // ======= MAPA / FALLBACK =======
         Card(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.elevatedCardElevation(6.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
                 if (hasGms) {
                     Box(Modifier.size(280.dp).clip(CircleShape)) {
                         GoogleMap(
                             modifier = Modifier.matchParentSize(),
                             cameraPositionState = camera,
-                            properties = MapProperties(isMyLocationEnabled = false),
-                            uiSettings = MapUiSettings(
-                                zoomControlsEnabled = false,
-                                myLocationButtonEnabled = false
-                            )
+                            properties = MapProperties(isMyLocationEnabled = loc.hasPermission),
+                            uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
                         )
                     }
                 } else {
-                    Text(
-                        "Mapa no disponible en este dispositivo.\n(Usa un emulador/telefono con Google Play Services).",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(16.dp)
-                    )
+                    Text("Mapa no disponible (sin Google Play Services)", textAlign = TextAlign.Center, modifier = Modifier.padding(16.dp))
                 }
             }
         }
-        // ======= FIN MAPA =======
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(12.dp))
+        // Info de sensores mínima para sustentar “2 sensores”
+        Text("Acelerómetro: ${"%.1f".format(accel)} m/s² · Luz: ${light?.let { "%.0f lx".format(it) } ?: "--"}")
 
+        Spacer(Modifier.height(16.dp))
         OutlinedButton(
             onClick = onGoToChat,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(52.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(52.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             shape = MaterialTheme.shapes.medium
         ) { Text("Chat vecinal") }
 
         Spacer(Modifier.height(16.dp))
-
         Button(
-            onClick = { showConfirm = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(64.dp)
-                .shadow(12.dp, RoundedCornerShape(14.dp)),
+            onClick = { Toast.makeText(context, "Alerta silenciosa enviada", Toast.LENGTH_SHORT).show() },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(64.dp).shadow(12.dp, RoundedCornerShape(14.dp)),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             contentPadding = PaddingValues(),
             shape = RoundedCornerShape(14.dp)
         ) {
             Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(listOf(ZonRed, ZonRedDark)),
-                        RoundedCornerShape(14.dp)
-                    ),
+                Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(ZonRed, ZonRedDark)), RoundedCornerShape(14.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -135,19 +114,5 @@ fun HomeScreen(onGoToChat: () -> Unit = {}) {
                 }
             }
         }
-    }
-
-    if (showConfirm) {
-        AlertDialog(
-            onDismissRequest = { showConfirm = false },
-            text = { Text("¿Desea enviar una alerta silenciosa a las autoridades?") },
-            confirmButton = {
-                FilledTonalButton(onClick = {
-                    showConfirm = false
-                    Toast.makeText(context, "Alerta silenciosa enviada", Toast.LENGTH_SHORT).show()
-                }) { Text("Confirmar") }
-            },
-            dismissButton = { OutlinedButton({ showConfirm = false }) { Text("Cancelar") } }
-        )
     }
 }
