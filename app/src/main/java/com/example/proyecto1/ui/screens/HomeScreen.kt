@@ -13,28 +13,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyecto1.util.isPlayServicesOk
+import com.example.proyecto1.util.rememberMyLocation
 import com.google.android.gms.maps.CameraUpdateFactory as GmsCameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 
 @Composable
 fun HomeScreen(onGoToChat: () -> Unit = {}) {
     val ctx = LocalContext.current
 
-    // Evita ambigüedad: no importes la función, llámala calificada
-    val hasGms = remember(ctx) { com.example.proyecto1.util.isPlayServicesOk(ctx) }
-    val myLoc by com.example.proyecto1.util.rememberMyLocation()
+    // Play Services ok?
+    val hasGms = remember(ctx) { isPlayServicesOk(ctx) }
+
+    // Ubicación observada como State<LatLng?>
+    val myLoc by rememberMyLocation()
 
     val center = myLoc ?: LatLng(4.6539, -74.0580) // Bogotá
     val camera = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(center, 14.5f)
     }
 
-    // Anima cuando llega la ubicación
+    // Animar cuando llega la ubicación
     LaunchedEffect(myLoc) {
         myLoc?.let { camera.animate(GmsCameraUpdateFactory.newLatLngZoom(it, 15f), 800) }
     }
@@ -92,9 +93,7 @@ fun HomeScreen(onGoToChat: () -> Unit = {}) {
                 .padding(horizontal = 16.dp)
                 .height(52.dp),
             shape = MaterialTheme.shapes.medium
-        ) {
-            Text("Chat vecinal")
-        }
+        ) { Text("Chat vecinal") }
 
         Spacer(Modifier.height(16.dp))
 

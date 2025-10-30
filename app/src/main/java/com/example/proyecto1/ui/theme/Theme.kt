@@ -1,55 +1,27 @@
 package com.example.proyecto1.ui.theme
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// Marca (logo: azul ↔ naranja) + rojos de alerta (usados en HomeScreen)
-val ZonBlue       = Color(0xFF33B5F6)
-val ZonBlueDeep   = Color(0xFF1592D1)
-val ZonOrange     = Color(0xFFFF8A3D)
-val ZonOrangeDeep = Color(0xFFF26419)
-val ZonRed        = Color(0xFFFF6B6B)
-val ZonRedDark    = Color(0xFFC62828)
+// Colores de marca (logo)
+val ZonBlue        = Color(0xFF1E88E5) // primario
+val ZonBlueLight   = Color(0xFF64B5F6)
+val ZonBlueDark    = Color(0xFF1565C0)
 
-private val Ink      = Color(0xFF121416)
-private val Graphite = Color(0xFF0B0D0E)
+val ZonOrange      = Color(0xFFFB8C00) // secundario
+val ZonOrangeLight = Color(0xFFFFB74D)
+val ZonOrangeDark  = Color(0xFFEF6C00)
 
-private val Light = lightColorScheme(
-    primary = ZonBlueDeep,
-    onPrimary = Color.White,
-    secondary = ZonOrangeDeep,
-    onSecondary = Color.White,
-    background = Color.White,
-    onBackground = Ink,
-    surface = Color.White,
-    onSurface = Ink
-)
+val ZonCyan        = Color(0xFF26C6DA) // terciario/acento frío
+val ZonCyanLight   = Color(0xFF80DEEA)
+val ZonCyanDark    = Color(0xFF0097A7)
 
-private val Dark = darkColorScheme(
-    primary = ZonBlue,
-    onPrimary = Color.Black,
-    secondary = ZonOrange,
-    onSecondary = Color.Black,
-    background = Ink,
-    onBackground = Color.White,
-    surface = Graphite,
-    onSurface = Color.White
-)
+// Fondos / superficies
+val ZonBackgroundLight = Color(0xFFF8F9FC) // casi blanco cálido
+val ZonSurfaceLight    = Color(0xFFFFFFFF)
 
-/**
- * Versión sin accompanist (no toca barras del sistema).
- * Si luego quieres, añadimos systemuicontroller otra vez.
- */
-@Composable
-fun ZonappTheme(darkTheme: Boolean = true, content: @Composable () -> Unit) {
-    val colors = if (darkTheme) Dark else Light
-    MaterialTheme(
-        colorScheme = colors,
-        typography = Typography(),
-        content = content
-    )
-}
+val ZonBackgroundDark  = Color(0xFF101318) // gris-neutro profundo
+val ZonSurfaceDark     = Color(0xFF1A1D22)
+
+// Rojos ya usados (por tu CTA “Alerta silenciosa”)
+val ZonRed     = Color(0xFFE53935)
+val ZonRedDark = Color(0xFFC62828)

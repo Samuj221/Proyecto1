@@ -1,23 +1,38 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Red / Firebase -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Localización -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- Cámara + micrófono -->
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- Almacenamiento (compatibilidad) -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!-- Almacenamiento / Media -->
+    <!-- Para Android 12 o menor -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
-    <uses-feature android:name="android.hardware.camera.any" android:required="false"/>
+    <!-- Para Android 13+ (API 33+) -->
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:targetApi="33" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VIDEO"
+        tools:targetApi="33" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_AUDIO"
+        tools:targetApi="33" />
+
+    <!-- El dispositivo puede no tener cámara; no hacemos la app incompatible -->
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
 
     <application
         android:allowBackup="true"

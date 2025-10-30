@@ -1,49 +1,43 @@
 package com.example.proyecto1.util
 
 import android.Manifest
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.tasks.await
-
-fun isPlayServicesOk(context: Context): Boolean =
-    GoogleApiAvailability.getInstance()
-        .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
-
-fun hasLocationPermission(context: Context): Boolean =
-    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
-suspend fun getCurrentLatLng(context: Context): LatLng? {
-    val client = LocationServices.getFusedLocationProviderClient(context)
-    return try {
-        val last = client.lastLocation.await()
-        if (last != null) LatLng(last.latitude, last.longitude)
-        else {
-            val cur = client.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).await()
-            cur?.let { LatLng(it.latitude, it.longitude) }
-        }
-    } catch (_: SecurityException) {
-        null
-    } catch (_: Exception) {
-        null
-    }
-}
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 @Composable
 fun rememberMyLocation(): State<LatLng?> {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val state = remember { mutableStateOf<LatLng?>(null) }
-    LaunchedEffect(Unit) {
-        if (hasLocationPermission(ctx)) {
-            state.value = getCurrentLatLng(ctx)
+
+    LaunchedEffect(context) {
+        val fine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+        val coarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (fine != PackageManager.PERMISSION_GRANTED && coarse != PackageManager.PERMISSION_GRANTED) {
+            state.value = null
+            return@LaunchedEffect
         }
+
+        val fused = LocationServices.getFusedLocationProviderClient(context)
+        val cts = CancellationTokenSource()
+
+        @SuppressLint("MissingPermission")
+        val loc = suspendCancellableCoroutine<android.location.Location?> { cont ->
+            fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
+                .addOnSuccessListener { cont.resume(it) }
+                .addOnFailureListener { cont.resume(null) }
+        }
+
+        state.value = loc?.let { LatLng(it.latitude, it.longitude) }
     }
+
     return state
 }

@@ -1,80 +1,170 @@
 package com.example.proyecto1.ui.screens
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CameraAlt
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.firebase.FirebaseApp
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-
-data class ChatMsg(val id: String, val text: String, val ts: Long)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun ChatScreen() {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    val useFirebase = remember { FirebaseApp.getApps(ctx).isNotEmpty() } // evita crash si no hay google-services
-    val mensajes = remember { mutableStateListOf<ChatMsg>() }
-    var input by remember { mutableStateOf(TextFieldValue("")) }
-    var error by remember { mutableStateOf<String?>(null) }
+fun ChatScreen(
+    vm: ChatViewModel = viewModel()
+) {
+    val ctx = LocalContext.current
+    val listState = rememberLazyListState()
+    var input by rememberSaveable { mutableStateOf("") }
 
-    // Suscripción “segura”
-    LaunchedEffect(useFirebase) {
-        if (!useFirebase) return@LaunchedEffect
-        val db = Firebase.firestore
-        val ref = db.collection("zonapp-chat").orderBy("ts")
-        ref.addSnapshotListener { snap, e ->
-            if (e != null) { error = e.localizedMessage; return@addSnapshotListener }
-            mensajes.clear()
-            snap?.forEach { d ->
-                mensajes.add(
-                    ChatMsg(
-                        id = d.id,
-                        text = d.getString("text").orEmpty(),
-                        ts = d.getLong("ts") ?: 0L
-                    )
+    // Auto-scroll al último mensaje
+    LaunchedEffect(vm.messages.size) {
+        if (vm.messages.isNotEmpty()) {
+            listState.animateScrollToItem(vm.messages.lastIndex)
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 8.dp)
+    ) {
+        Text(
+            "Chat vecinal (demo local)",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+            state = listState
+        ) {
+            items(vm.messages, key = { it.id }) { msg ->
+                MessageBubble(
+                    text = msg.text,
+                    time = msg.timestamp,
+                    fromMe = msg.fromMe
+                )
+                Spacer(Modifier.height(6.dp))
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            FilledTonalIconButton(
+                onClick = { Toast.makeText(ctx, "Abrir cámara (demo)", Toast.LENGTH_SHORT).show() }
+            ) { Icon(Icons.Rounded.CameraAlt, contentDescription = "Cámara") }
+
+            FilledTonalIconButton(
+                onClick = { Toast.makeText(ctx, "Abrir galería (demo)", Toast.LENGTH_SHORT).show() }
+            ) { Icon(Icons.Rounded.Image, contentDescription = "Galería") }
+
+            FilledTonalIconButton(
+                onClick = { Toast.makeText(ctx, "Grabar audio (demo)", Toast.LENGTH_SHORT).show() }
+            ) { Icon(Icons.Rounded.Mic, contentDescription = "Micrófono") }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 56.dp),
+                placeholder = { Text("Escribe un mensaje…") },
+                maxLines = 4
+            )
+            Spacer(Modifier.width(10.dp))
+            FilledIconButton(
+                onClick = {
+                    vm.send(input)
+                    input = ""
+                },
+                modifier = Modifier.size(48.dp)
+            ) { Icon(Icons.Rounded.Send, contentDescription = "Enviar") }
+        }
+    }
+}
+
+@Composable
+private fun MessageBubble(text: String, time: Long, fromMe: Boolean) {
+    val bubbleColor =
+        if (fromMe) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.surfaceVariant
+    val onBubble =
+        if (fromMe) MaterialTheme.colorScheme.onPrimary
+        else MaterialTheme.colorScheme.onSurfaceVariant
+
+    val shape = RoundedCornerShape(
+        topStart = 16.dp,
+        topEnd = 16.dp,
+        bottomEnd = if (fromMe) 0.dp else 16.dp,
+        bottomStart = if (fromMe) 16.dp else 0.dp
+    )
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = if (fromMe) Alignment.End else Alignment.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(shape)
+                .background(bubbleColor)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Column(horizontalAlignment = if (fromMe) Alignment.End else Alignment.Start) {
+                Text(text, color = onBubble)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = time.formatHour(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = onBubble.copy(alpha = 0.8f)
                 )
             }
         }
     }
+}
 
-    Column(Modifier.fillMaxSize().padding(12.dp)) {
-        Text("Chat vecinal (beta)", style = MaterialTheme.typography.titleLarge)
-        if (!useFirebase) {
-            Spacer(Modifier.height(8.dp))
-            Text("El chat en vivo requiere configurar Firebase (google-services.json y Firestore). La app seguirá funcionando sin cerrar.")
-        }
-        error?.let { Text("Error: $it", color = MaterialTheme.colorScheme.error) }
-        Spacer(Modifier.height(8.dp))
-
-        LazyColumn(Modifier.weight(1f), reverseLayout = false) {
-            items(mensajes, key = { it.id }) { m ->
-                ElevatedCard(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                    Text(m.text, Modifier.padding(12.dp))
-                }
-            }
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = input, onValueChange = { input = it },
-                modifier = Modifier.weight(1f), placeholder = { Text("Escribe un mensaje…") }
-            )
-            Button(
-                onClick = {
-                    val txt = input.text.trim()
-                    if (txt.isNotEmpty() && useFirebase) {
-                        Firebase.firestore.collection("zonapp-chat").add(
-                            mapOf("text" to txt, "ts" to System.currentTimeMillis())
-                        )
-                        input = TextFieldValue("")
-                    }
-                }
-            ) { Text("Enviar") }
-        }
+private fun Long.formatHour(): String {
+    return try {
+        val fmt = SimpleDateFormat("HH:mm", Locale.getDefault())
+        fmt.format(Date(this))
+    } catch (_: Throwable) {
+        ""
     }
 }
