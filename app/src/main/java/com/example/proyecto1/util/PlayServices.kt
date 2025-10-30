@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 
-fun isPlayServicesOk(context: Context): Boolean {
-    val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
-    return status == ConnectionResult.SUCCESS
-}
+fun isPlayServicesOk(context: Context): Boolean =
+    GoogleApiAvailability.getInstance()
+        .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS

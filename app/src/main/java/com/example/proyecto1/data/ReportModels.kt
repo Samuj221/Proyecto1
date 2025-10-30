@@ -1,10 +1,15 @@
 package com.example.proyecto1.data
 
-import com.google.android.gms.maps.model.LatLng
+import java.util.UUID
+
+enum class Severity { LOW, MEDIUM, HIGH }
 
 data class Report(
+    val id: String = UUID.randomUUID().toString(),
     val title: String,
     val description: String,
     val severity: Severity,
-    val location: LatLng
+    val lat: Double,
+    val lng: Double,
+    val timestamp: Long = System.currentTimeMillis()
 )
