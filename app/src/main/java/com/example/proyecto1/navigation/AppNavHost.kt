@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/proyecto1/navigation/AppNavHost.kt
 package com.example.proyecto1.navigation
 
 import androidx.compose.runtime.Composable
@@ -10,30 +11,37 @@ import com.example.proyecto1.ui.screens.*
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    startDestination: String = Routes.Home.route,
-    modifier: Modifier
+    startDestination: String,
+    modifier: Modifier = Modifier
 ) {
-    NavHost(navController = navController, startDestination = startDestination) {
-
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
         composable(Routes.Home.route) {
             HomeScreen(
-                onGoToChat = { navController.navigate(Routes.Chat.route) },
+                onGoToChat    = { navController.navigate(Routes.Chat.route) },
                 onGoToReports = { navController.navigate(Routes.ReportsList.route) },
-                onGoToMap = { navController.navigate(Routes.IncidentsMap.route) }
+                onGoToMap     = { navController.navigate(Routes.IncidentsMap.route) } // si no tienes esta pantalla, comenta esta línea y la route
             )
         }
 
         composable(Routes.ReportsList.route) {
-            ReportsListScreen(onCreate = { navController.navigate(Routes.ReportCreate.route) })
+            ReportsListScreen(
+                onCreate = { navController.navigate(Routes.ReportCreate.route) }
+            )
         }
 
         composable(Routes.ReportCreate.route) {
             ReportCreateScreen(onDone = { navController.popBackStack() })
         }
 
-        composable(Routes.Chat.route) { ChatScreen() }
+        composable(Routes.Chat.route)    { ChatScreen() }
         composable(Routes.Profile.route) { ProfileScreen() }
-        composable(Routes.Admin.route) { AdminPanelScreen() }
+        composable(Routes.Admin.route)   { AdminPanelScreen() }
+
+        // Si NO tienes IncidentsMapScreen todavía, comenta esta route.
         composable(Routes.IncidentsMap.route) { IncidentsMapScreen() }
     }
 }

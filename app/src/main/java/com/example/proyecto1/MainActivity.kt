@@ -3,7 +3,6 @@ package com.example.proyecto1
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.Home
@@ -25,6 +24,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.padding
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1.navigation.AppNavHost
 import com.example.proyecto1.navigation.Routes
@@ -45,23 +45,23 @@ class MainActivity : ComponentActivity() {
 fun ZonappApp() {
     ZonappTheme {
         val nav = rememberNavController()
-        val drawer = rememberDrawerState(DrawerValue.Closed)
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
         val items = listOf(
-            DrawerItem("Inicio",       Icons.Rounded.Home,      Routes.Home.route),
-            DrawerItem("Reportes",     Icons.Rounded.ListAlt,   Routes.ReportsList.route), // ← clave
-            DrawerItem("Chat vecinal", Icons.Rounded.Chat,      Routes.Chat.route),
-            DrawerItem("Ajustes",      Icons.Rounded.Settings,  Routes.Profile.route),
-            DrawerItem("Admin",        Icons.Rounded.Verified,  Routes.Admin.route),
+            DrawerItem("Inicio", Icons.Rounded.Home, Routes.Home.route),
+            DrawerItem("Reportes", Icons.Rounded.ListAlt, Routes.ReportsList.route),
+            DrawerItem("Chat vecinal", Icons.Rounded.Chat, Routes.Chat.route),
+            DrawerItem("Ajustes", Icons.Rounded.Settings, Routes.Profile.route),
+            DrawerItem("Admin", Icons.Rounded.Verified, Routes.Admin.route),
         )
 
         ModalNavigationDrawer(
-            drawerState = drawer,
+            drawerState = drawerState,
             drawerContent = {
                 AppDrawer(items) { route ->
                     scope.launch {
-                        drawer.close()
+                        drawerState.close()
                         nav.navigate(route) {
                             popUpTo(Routes.Home.route) { inclusive = false }
                             launchSingleTop = true
@@ -75,16 +75,13 @@ fun ZonappApp() {
                     CenterAlignedTopAppBar(
                         title = { Text("Zonapp") },
                         navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawer.open() } }) {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(Icons.Rounded.Menu, contentDescription = "Menú")
                             }
                         },
                         actions = {
                             IconButton(onClick = { /* TODO: notificaciones */ }) {
-                                Icon(
-                                    Icons.Rounded.Notifications,
-                                    contentDescription = "Notificaciones"
-                                )
+                                Icon(Icons.Rounded.Notifications, contentDescription = "Notificaciones")
                             }
                         },
                         colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
@@ -94,7 +91,7 @@ fun ZonappApp() {
                 AppNavHost(
                     navController = nav,
                     startDestination = Routes.Home.route,
-                    modifier = Modifier.padding(inner) // evita solape con la TopBar
+                    modifier = Modifier.padding(inner)
                 )
             }
         }

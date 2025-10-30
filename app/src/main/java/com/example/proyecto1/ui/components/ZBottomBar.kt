@@ -1,33 +1,55 @@
-package com.example.proyecto1.ui.theme
+package com.example.proyecto1.ui.components
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Chat
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.ListAlt
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.proyecto1.navigation.Routes
 
-// Paleta alineada al logo
-val ZonBlue        = Color(0xFF1E88E5)
-val ZonBlueLight   = Color(0xFF64B5F6)
-val ZonBlueDark    = Color(0xFF1565C0)
+data class BottomItem(val title: String, val route: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
-val ZonOrange      = Color(0xFFFB8C00)
-val ZonOrangeLight = Color(0xFFFFB74D)
-val ZonOrangeDark  = Color(0xFFEF6C00)
+private val items = listOf(
+    BottomItem("Inicio",   Routes.Home.route,        Icons.Rounded.Home),
+    BottomItem("Reportes", Routes.ReportsList.route, Icons.Rounded.ListAlt),
+    BottomItem("Chat",     Routes.Chat.route,        Icons.Rounded.Chat),
+)
 
-val ZonCyan        = Color(0xFF26C6DA)
-val ZonCyanLight   = Color(0xFF80DEEA)
-val ZonCyanDark    = Color(0xFF0097A7)
+@Composable
+fun ZBottomBar(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-val ZonBackgroundLight = Color(0xFFF8F9FC)
-val ZonSurfaceLight    = Color(0xFFFFFFFF)
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        items.forEach { item ->
+            val selected = currentDestination.isTopLevel(item.route)
+            NavigationBarItem(
+                selected = selected,
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(Routes.Home.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                icon = { Icon(item.icon, contentDescription = item.title) },
+                label = { Text(item.title) }
+            )
+        }
+    }
+}
 
-val ZonBackgroundDark  = Color(0xFF101318)
-val ZonSurfaceDark     = Color(0xFF1A1D22)
-
-val ZonRed     = Color(0xFFE53935)
-val ZonRedDark = Color(0xFFC62828)
-
-// ---- Aliases para compatibilidad con nombres antiguos ----
-val ZBlue = ZonBlue;           val ZBlueLight = ZonBlueLight;     val ZBlueDark = ZonBlueDark
-val ZOrange = ZonOrange;       val ZOrangeLight = ZonOrangeLight; val ZOrangeDark = ZonOrangeDark
-val ZCyan = ZonCyan;           val ZCyanLight = ZonCyanLight;     val ZCyanDark = ZonCyanDark
-val ZRed = ZonRed;             val ZRedDark = ZonRedDark
-val ZBackgroundLight = ZonBackgroundLight; val ZBackgroundDark = ZonBackgroundDark
-val ZSurfaceLight    = ZonSurfaceLight;    val ZSurfaceDark    = ZonSurfaceDark
+private fun NavDestination?.isTopLevel(route: String): Boolean =
+    this?.hierarchy?.any { it.route == route } == true
