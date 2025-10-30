@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
 @Composable
-fun HomeScreen(onGoToChat: () -> Unit = {}) {
+fun HomeScreen(onGoToChat: () -> Unit = {}, onGoToReports: () -> Unit, onGoToMap: () -> Unit) {
     val ctx = LocalContext.current
 
     // Play Services ok?

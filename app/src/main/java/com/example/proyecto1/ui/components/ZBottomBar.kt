@@ -1,58 +1,33 @@
-package com.samupro.proyecto1.ui.components
+package com.example.proyecto1.ui.theme
 
+import androidx.compose.ui.graphics.Color
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Explore
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Brush
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.samupro.proyecto1.navigation.Dest
-import com.samupro.proyecto1.ui.theme.ZBlue
-import com.samupro.proyecto1.ui.theme.ZOrange
+// Paleta alineada al logo
+val ZonBlue        = Color(0xFF1E88E5)
+val ZonBlueLight   = Color(0xFF64B5F6)
+val ZonBlueDark    = Color(0xFF1565C0)
 
+val ZonOrange      = Color(0xFFFB8C00)
+val ZonOrangeLight = Color(0xFFFFB74D)
+val ZonOrangeDark  = Color(0xFFEF6C00)
 
-@Composable
-fun ZBottomBar(nav: NavHostController) {
-    val items = Dest.bottom
-    val entry by nav.currentBackStackEntryAsState()
-    val current = entry?.destination
+val ZonCyan        = Color(0xFF26C6DA)
+val ZonCyanLight   = Color(0xFF80DEEA)
+val ZonCyanDark    = Color(0xFF0097A7)
 
+val ZonBackgroundLight = Color(0xFFF8F9FC)
+val ZonSurfaceLight    = Color(0xFFFFFFFF)
 
-    NavigationBar {
-        items.forEach { dest ->
-            val selected = current.isTopLevel(dest)
-            NavigationBarItem(
-                selected = selected,
-                onClick = { if (!selected) nav.navigate(dest.route) { launchSingleTop = true; popUpTo(Dest.Home.route) { saveState = true }; restoreState = true } },
-                icon = {
-                    val icon = when (dest) {
-                        Dest.Home -> Icons.Outlined.Home
-                        Dest.Explore -> Icons.Outlined.Explore
-                        Dest.Profile -> Icons.Outlined.Person
-                        Dest.Settings -> Icons.Outlined.Settings
-                    }
-                    Icon(icon, contentDescription = dest.label)
-                },
-                label = { Text(dest.label) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    indicatorColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-        }
-    }
-}
+val ZonBackgroundDark  = Color(0xFF101318)
+val ZonSurfaceDark     = Color(0xFF1A1D22)
 
+val ZonRed     = Color(0xFFE53935)
+val ZonRedDark = Color(0xFFC62828)
 
-private fun NavDestination?.isTopLevel(dest: Dest) = this?.hierarchy?.any { it.route == dest.route } == true
+// ---- Aliases para compatibilidad con nombres antiguos ----
+val ZBlue = ZonBlue;           val ZBlueLight = ZonBlueLight;     val ZBlueDark = ZonBlueDark
+val ZOrange = ZonOrange;       val ZOrangeLight = ZonOrangeLight; val ZOrangeDark = ZonOrangeDark
+val ZCyan = ZonCyan;           val ZCyanLight = ZonCyanLight;     val ZCyanDark = ZonCyanDark
+val ZRed = ZonRed;             val ZRedDark = ZonRedDark
+val ZBackgroundLight = ZonBackgroundLight; val ZBackgroundDark = ZonBackgroundDark
+val ZSurfaceLight    = ZonSurfaceLight;    val ZSurfaceDark    = ZonSurfaceDark
