@@ -1,52 +1,27 @@
-package com.samupro.proyecto1.ui.theme
-
+package com.example.proyecto1.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// Colores de marca (logo)
+val ZonBlue        = Color(0xFF1E88E5) // primario
+val ZonBlueLight   = Color(0xFF64B5F6)
+val ZonBlueDark    = Color(0xFF1565C0)
 
-// Paleta tomada del logo (aprox)
-val ZBlue = Color(0xFF33B5F6)
-val ZBlueDeep = Color(0xFF1592D1)
-val ZOrange = Color(0xFFFF8A3D)
-val ZOrangeDeep = Color(0xFFF26419)
+val ZonOrange      = Color(0xFFFB8C00) // secundario
+val ZonOrangeLight = Color(0xFFFFB74D)
+val ZonOrangeDark  = Color(0xFFEF6C00)
 
+val ZonCyan        = Color(0xFF26C6DA) // terciario/acento frío
+val ZonCyanLight   = Color(0xFF80DEEA)
+val ZonCyanDark    = Color(0xFF0097A7)
 
-// Tesla‑like neutrales
-val Graphite = Color(0xFF0B0D0E)
-val Ink = Color(0xFF121416)
-val Silver = Color(0xFF8E99A3)
-val Mist = Color(0xFFE8ECEF)
+// Fondos / superficies
+val ZonBackgroundLight = Color(0xFFF8F9FC) // casi blanco cálido
+val ZonSurfaceLight    = Color(0xFFFFFFFF)
 
+val ZonBackgroundDark  = Color(0xFF101318) // gris-neutro profundo
+val ZonSurfaceDark     = Color(0xFF1A1D22)
 
-// Material 3 schemes
-val lightScheme = androidx.compose.material3.lightColorScheme(
-    primary = ZBlueDeep,
-    onPrimary = Color.White,
-    primaryContainer = ZBlue,
-    onPrimaryContainer = Color.Black,
-    secondary = ZOrangeDeep,
-    onSecondary = Color.White,
-    secondaryContainer = ZOrange,
-    onSecondaryContainer = Color.Black,
-    background = Color.White,
-    onBackground = Ink,
-    surface = Color.White,
-    onSurface = Ink,
-    outline = Silver
-)
-
-
-val darkScheme = androidx.compose.material3.darkColorScheme(
-    primary = ZBlue,
-    onPrimary = Color.Black,
-    primaryContainer = ZBlueDeep,
-    onPrimaryContainer = Color.White,
-    secondary = ZOrange,
-    onSecondary = Color.Black,
-    secondaryContainer = ZOrangeDeep,
-    onSecondaryContainer = Color.White,
-    background = Ink,
-    onBackground = Color.White,
-    surface = Graphite,
-    onSurface = Color.White,
-)
+// Rojos ya usados (por tu CTA “Alerta silenciosa”)
+val ZonRed     = Color(0xFFE53935)
+val ZonRedDark = Color(0xFFC62828)
