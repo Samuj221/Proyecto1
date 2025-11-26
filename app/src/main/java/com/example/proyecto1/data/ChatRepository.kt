@@ -24,9 +24,11 @@ object ChatRepository {
 
     private val localBus = MutableStateFlow<List<ChatMessage>>(emptyList())
 
-
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { Firebase.firestore }
+
+    val currentUid: String?
+        get() = if (!BuildConfig.FIREBASE_ENABLED) null else auth.currentUser?.uid
 
     suspend fun ensureSignedIn() {
         if (!BuildConfig.FIREBASE_ENABLED) return

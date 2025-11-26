@@ -1,6 +1,12 @@
 package com.example.proyecto1.ui.screens
 
+import android.app.Activity
+import android.content.Intent
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,6 +39,36 @@ fun ChatScreen(
     val listState = rememberLazyListState()
     var input by rememberSaveable { mutableStateOf("") }
 
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            if (bitmap != null) {
+                Toast.makeText(ctx, "Foto tomada", Toast.LENGTH_SHORT).show()
+                // aquí podrías subir la foto a Firebase Storage
+            } else {
+                Toast.makeText(ctx, "No se tomó ninguna foto", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                Toast.makeText(ctx, "Imagen seleccionada", Toast.LENGTH_SHORT).show()
+                // aquí podrías subir el uri a Firebase Storage
+            } else {
+                Toast.makeText(ctx, "No se seleccionó imagen", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    val audioLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Toast.makeText(ctx, "Audio grabado", Toast.LENGTH_SHORT).show()
+                // aquí podrías subir el audio a Firebase Storage
+            } else {
+                Toast.makeText(ctx, "Grabación cancelada", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     LaunchedEffect(vm.messages.size) {
         if (vm.messages.isNotEmpty()) {
             listState.animateScrollToItem(vm.messages.lastIndex)
@@ -44,31 +80,35 @@ fun ChatScreen(
             .fillMaxSize()
             .padding(bottom = 8.dp)
     ) {
-        Text(
-            "Chat vecinal (demo local)",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-            state = listState
-        ) {
-            items(vm.messages, key = { it.id }) { msg ->
-                MessageBubble(
-                    text = msg.text,
-                    time = msg.timestamp,
-                    fromMe = msg.fromMe
+        if (vm.messages.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Aún no hay mensajes en el vecindario.\n¡Escribe el primero!",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(Modifier.height(6.dp))
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                state = listState
+            ) {
+                items(vm.messages, key = { it.id }) { msg ->
+                    MessageBubble(
+                        text = msg.text,
+                        time = msg.timestamp,
+                        fromMe = msg.fromMe
+                    )
+                    Spacer(Modifier.height(6.dp))
+                }
             }
         }
 
@@ -79,16 +119,31 @@ fun ChatScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             FilledTonalIconButton(
-                onClick = { Toast.makeText(ctx, "Abrir cámara (demo)", Toast.LENGTH_SHORT).show() }
-            ) { Icon(Icons.Rounded.CameraAlt, contentDescription = "Cámara") }
+                onClick = {
+                    cameraLauncher.launch(null)
+                }
+            ) {
+                Icon(Icons.Rounded.CameraAlt, contentDescription = "Cámara")
+            }
 
             FilledTonalIconButton(
-                onClick = { Toast.makeText(ctx, "Abrir galería (demo)", Toast.LENGTH_SHORT).show() }
-            ) { Icon(Icons.Rounded.Image, contentDescription = "Galería") }
+                onClick = {
+                    galleryLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+            ) {
+                Icon(Icons.Rounded.Image, contentDescription = "Galería")
+            }
 
             FilledTonalIconButton(
-                onClick = { Toast.makeText(ctx, "Grabar audio (demo)", Toast.LENGTH_SHORT).show() }
-            ) { Icon(Icons.Rounded.Mic, contentDescription = "Micrófono") }
+                onClick = {
+                    val intent = Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION)
+                    audioLauncher.launch(intent)
+                }
+            ) {
+                Icon(Icons.Rounded.Mic, contentDescription = "Micrófono")
+            }
         }
 
         Spacer(Modifier.height(8.dp))
@@ -115,7 +170,9 @@ fun ChatScreen(
                     input = ""
                 },
                 modifier = Modifier.size(48.dp)
-            ) { Icon(Icons.Rounded.Send, contentDescription = "Enviar") }
+            ) {
+                Icon(Icons.Rounded.Send, contentDescription = "Enviar")
+            }
         }
     }
 }

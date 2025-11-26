@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852233335306",
+    "project_id": "zanapp-fece3",
+    "storage_bucket": "zanapp-fece3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852233335306:android:4ef7b1e417b1f96222a5f3",
+        "android_client_info": {
+          "package_name": "com.example.proyecto1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-fHQyuI9WICMr1K0wDG6lrUMDJux2aQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
