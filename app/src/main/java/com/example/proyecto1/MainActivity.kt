@@ -9,7 +9,6 @@ import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.ListAlt
 import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -23,10 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
@@ -83,15 +82,22 @@ fun ZonappApp() {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    AppDrawer(items) { route ->
-                        scope.launch {
-                            drawerState.close()
-                            nav.navigate(route) {
-                                popUpTo(Routes.Home.route) { inclusive = false }
-                                launchSingleTop = true
+                    AppDrawer(
+                        items = items,
+                        onDestinationClicked = { route ->
+                            scope.launch {
+                                drawerState.close()
+                                nav.navigate(route) {
+                                    popUpTo(Routes.Home.route) { inclusive = false }
+                                    launchSingleTop = true
+                                }
                             }
+                        },
+                        onLogout = {
+                            FirebaseAuthManager.signOut()
+                            isAuthenticated = false
                         }
-                    }
+                    )
                 }
             ) {
                 Scaffold(
@@ -101,11 +107,6 @@ fun ZonappApp() {
                             navigationIcon = {
                                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                     Icon(Icons.Rounded.Menu, contentDescription = "Menú")
-                                }
-                            },
-                            actions = {
-                                IconButton(onClick = { }) {
-                                    Icon(Icons.Rounded.Notifications, contentDescription = "Notificaciones")
                                 }
                             },
                             colors = TopAppBarDefaults.centerAlignedTopAppBarColors()

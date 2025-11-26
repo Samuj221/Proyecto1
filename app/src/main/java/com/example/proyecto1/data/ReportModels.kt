@@ -1,13 +1,14 @@
 package com.example.proyecto1.data
 
-import java.util.UUID
+import com.google.firebase.Timestamp
 
 data class Report(
-    val id: String = UUID.randomUUID().toString(),
-    val title: String,
-    val description: String,
-    val severity: Severity = Severity.MEDIUM,
-    val lat: Double,
-    val lng: Double,
-    val timestamp: Long = System.currentTimeMillis()
+    val id: String = "",
+    val title: String = "",
+    val description: String = "",
+    val severity: Severity = Severity.LOW,
+    val lat: Double? = null,
+    val lng: Double? = null,
+    val uid: String? = null,
+    val ts: Timestamp? = null
 )

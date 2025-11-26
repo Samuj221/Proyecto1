@@ -14,81 +14,77 @@ import com.example.proyecto1.data.ReportsRepository
 import com.example.proyecto1.data.Severity
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
-
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 
 @Composable
-fun ReportCreateScreen(onDone: () -> Unit) {
+fun ReportCreateScreen(
+    onDone: () -> Unit
+) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var title by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
-    var severity by remember { mutableStateOf(Severity.MEDIUM) }
-    var picked by remember { mutableStateOf<LatLng?>(null) }
+    var severity by remember { mutableStateOf(Severity.LOW) }
 
-    val hasGms by remember {
-        mutableStateOf(com.example.proyecto1.util.isPlayServicesOk(context))
-    }
-
-    val center = picked ?: LatLng(4.6539, -74.0580)
+    val bogota = LatLng(4.60971, -74.08175)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(center, 14.5f)
+        position = CameraPosition.fromLatLngZoom(bogota, 12f)
     }
 
-    Column(Modifier.fillMaxSize()) {
+    var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
 
-        // MAPA
-        Card(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp)
+    ) {
+
+        Text(
+            text = "Crear reporte",
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(240.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                if (hasGms) {
-                    GoogleMap(
-                        modifier = Modifier.matchParentSize(),
-                        cameraPositionState = cameraPositionState,
-                        onMapClick = { picked = it },
-                        properties = MapProperties(),
-                        uiSettings = MapUiSettings(zoomControlsEnabled = false)
-                    ) {
-                        picked?.let { Marker(state = MarkerState(it)) }
-                    }
-                } else {
-                    Text(
-                        "Mapa no disponible (Google Play Services)",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
-        }
+        )
 
-        // FORM
+        Spacer(Modifier.height(8.dp))
+
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             label = { Text("Título") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-        Spacer(Modifier.height(8.dp))
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Descripción") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            singleLine = true
         )
 
         Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            label = { Text("Descripción") },
+            minLines = 2
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Severidad",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        Spacer(Modifier.height(4.dp))
+
         Row(
             Modifier
                 .fillMaxWidth()
@@ -112,27 +108,76 @@ fun ReportCreateScreen(onDone: () -> Unit) {
             )
         }
 
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = "Ubicación (toca el mapa)",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        Spacer(Modifier.height(4.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(260.dp)
+                .padding(horizontal = 16.dp)
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                onMapClick = { latLng ->
+                    selectedPosition = latLng
+                }
+            ) {
+                selectedPosition?.let { p ->
+                    Marker(
+                        state = MarkerState(position = p),
+                        title = "Ubicación del reporte"
+                    )
+                }
+            }
+        }
+
         Spacer(Modifier.height(16.dp))
 
         Button(
             onClick = {
-                val p = picked
-                if (title.text.isBlank() || p == null) {
+                val t = title.text.trim()
+                val d = description.text.trim()
+                val p = selectedPosition
+
+                if (t.isEmpty() || d.isEmpty() || p == null) {
                     Toast.makeText(
                         context,
-                        "Completa título y toca el mapa para ubicar",
+                        "Completa título, descripción y selecciona la ubicación",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    ReportsRepository.add(
-                        context,
-                        title.text.trim(),
-                        description.text.trim(),
-                        severity,
-                        p
-                    )
-                    Toast.makeText(context, "Reporte enviado", Toast.LENGTH_SHORT).show()
-                    onDone()
+                    scope.launch {
+                        try {
+                            ReportsRepository.createReport(
+                                title = t,
+                                description = d,
+                                severity = severity,
+                                lat = p.latitude,
+                                lng = p.longitude
+                            )
+                            Toast.makeText(
+                                context,
+                                "Reporte enviado",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            onDone()
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                context,
+                                e.localizedMessage ?: "Error al guardar el reporte",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 }
             },
             modifier = Modifier
