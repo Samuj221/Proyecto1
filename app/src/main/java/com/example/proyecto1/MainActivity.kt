@@ -36,7 +36,9 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { ZonappApp() }
+        setContent {
+            ZonappApp()
+        }
     }
 }
 
@@ -47,7 +49,6 @@ fun ZonappApp() {
         val nav = rememberNavController()
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
-
         val items = listOf(
             DrawerItem("Inicio", Icons.Rounded.Home, Routes.Home.route),
             DrawerItem("Reportes", Icons.Rounded.ListAlt, Routes.ReportsList.route),
@@ -80,7 +81,7 @@ fun ZonappApp() {
                             }
                         },
                         actions = {
-                            IconButton(onClick = { /* TODO: notificaciones */ }) {
+                            IconButton(onClick = { }) {
                                 Icon(Icons.Rounded.Notifications, contentDescription = "Notificaciones")
                             }
                         },
